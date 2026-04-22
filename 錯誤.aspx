@@ -1,4 +1,4 @@
-<%@ Page Language="C#" %>
+﻿<%@ Page Language="C#" %>
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head runat="server">
