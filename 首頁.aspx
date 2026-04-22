@@ -112,7 +112,7 @@
             <div style="flex:1;min-width:0;">
                 <div style="font-size:13px;">
                     <b><%# Eval("操作類型") %></b>
-                    <%# Eval("檔案名稱") != DBNull.Value ? " - " + Eval("檔案名稱") : "" %>
+                    <%# Eval("檔案名稱") != null && Eval("檔案名稱").ToString() != "" ? " - " + Eval("檔案名稱") : "" %>
                 </div>
                 <div style="font-size:11px;color:#6b7280;">
                     <%# Eval("操作者IP") %> &bull; <%# 民國日期.轉換(Convert.ToDateTime(Eval("操作時間"))) %>
