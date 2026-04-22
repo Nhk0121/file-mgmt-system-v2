@@ -67,7 +67,17 @@ public static class 檔案權限輔助
             // 5. 檢查資料夾存取權限
             if (資料夾編號.HasValue)
             {
-                if (!權限輔助.可存取資料夾(資料夾編號.Value, 帳號編號))
+                var 資料夾dt = 資料庫輔助.查詢(
+                    "SELECT 組別編號, 儲存區類型 FROM 資料夾 WHERE 資料夾編號=@編號 AND 是否刪除=0",
+                    資料庫輔助.P("@編號", 資料夾編號.Value));
+
+                if (資料夾dt.Rows.Count == 0)
+                {
+                    錯誤訊息 = "資料夾不存在";
+                    return false;
+                }
+
+                if (!權限輔助.可存取資料夾(資料夾dt.Rows[0]))
                 {
                     錯誤訊息 = "無權限存取該資料夾";
                     return false;
