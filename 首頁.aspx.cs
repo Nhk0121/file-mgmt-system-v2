@@ -75,17 +75,15 @@ public partial class 首頁 : Page
 
             // 最近上傳（依角色範圍）
             var 上傳 = 資料庫輔助.查詢(string.Format(@"
-                SELECT TOP 8 f.檔案編號, f.原始檔名, f.儲存區類型, f.上傳時間, f.副檔名, g.組別名稱,
-                       ISNULL(u.姓名, f.上傳者IP) AS 上傳者姓名
+                SELECT TOP 8 f.檔案編號, f.原始檔名, f.儲存區類型, f.上傳時間, f.副檔名, g.組別名稱
                 FROM 檔案主檔 f
                 JOIN 組別設定 g ON f.組別編號=g.組別編號
-                LEFT JOIN 使用者帳號 u ON f.上傳者IP=u.最後登入IP
                 WHERE f.是否刪除=0{0}
                 ORDER BY f.上傳時間 DESC", 組別條件), 組別參數);
             rpt最近上傳.DataSource = 上傳;
             rpt最近上傳.DataBind();
 
-            // ── C1: 最近操作補帳號姓名（JOIN 使用者帳號）──
+            // 最近操作紀錄（使用帳號編號和登入帳號）
             string 操作條件 = 是管理員 ? "" : @"
                 AND EXISTS (SELECT 1 FROM 檔案主檔 f WHERE f.檔案編號=o.檔案編號 AND f.組別編號=@組別)";
             var 操作參數 = 是管理員
@@ -93,9 +91,9 @@ public partial class 首頁 : Page
                 : new[] { 資料庫輔助.P("@組別", 我的組別.Value) };
             var 操作 = 資料庫輔助.查詢(string.Format(@"
                 SELECT TOP 10 o.操作類型, o.操作者IP, o.操作時間, ISNULL(o.檔案名稱, '') AS 檔案名稱,
-                       ISNULL(u.姓名, o.操作者IP) AS 操作者姓名
+                       ISNULL(u.姓名, o.登入帳號) AS 操作者姓名
                 FROM 操作紀錄 o
-                LEFT JOIN 使用者帳號 u ON o.操作者IP=u.最後登入IP
+                LEFT JOIN 使用者帳號 u ON o.帳號編號=u.帳號編號
                 WHERE 1=1{0}
                 ORDER BY o.操作時間 DESC", 操作條件), 操作參數);
             rpt最近紀錄.DataSource = 操作;
