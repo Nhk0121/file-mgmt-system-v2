@@ -1,6 +1,7 @@
-﻿<%@ WebHandler Language="C#" Class="預覽" %>
+<%@ WebHandler Language="C#" Class="預覽" %>
 using System;
 using System.IO;
+using System.Text;
 using System.Web;
 
 public class 預覽 : IHttpHandler
@@ -71,12 +72,33 @@ public class 預覽 : IHttpHandler
             {
                 context.Response.ContentType = "text/html; charset=utf-8";
                 string 內容 = File.ReadAllText(路徑, System.Text.Encoding.UTF8);
-                context.Response.Write("<!DOCTYPE html>\n<html><head><meta charset='utf-8'>\n<style>body{font-family:'Noto Sans TC',sans-serif;padding:20px;background:#f8f9fa;}\npre{background:white;padding:20px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,0.08);}</style>\n</head><body><h4 style='color:#1a3a6b;margin-bottom:12px;'>" + HttpUtility.HtmlEncode(原始檔名) + "</h4>\n<pre>" + HttpUtility.HtmlEncode(內容) + "</pre></body></html>");
+                var sb = new StringBuilder();
+                sb.Append("<!DOCTYPE html>");
+                sb.Append("<html><head><meta charset='utf-8'>");
+                sb.Append("<style>");
+                sb.Append("body{font-family:'Noto Sans TC',sans-serif;padding:20px;background:#f8f9fa;}");
+                sb.Append("pre{background:white;padding:20px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,0.08);}");
+                sb.Append("</style>");
+                sb.Append("</head><body><h4 style='color:#1a3a6b;margin-bottom:12px;'>");
+                sb.Append(HttpUtility.HtmlEncode(原始檔名));
+                sb.Append("</h4>");
+                sb.Append("<pre>");
+                sb.Append(HttpUtility.HtmlEncode(內容));
+                sb.Append("</pre></body></html>");
+                context.Response.Write(sb.ToString());
                 return;
             }
 
             context.Response.ContentType = "text/html; charset=utf-8";
-            context.Response.Write("<html><body style='font-family:sans-serif;text-align:center;padding:50px;color:#6b7280;'>\n                <i style='font-size:48px;'>📄</i><br/><br/>\n                <p>此檔案格式不支援線上預覽</p>\n                <a href='../Handlers/下載.ashx?id=" + 檔案編號 + "' style='color:#1a3a6b;'>點此下載</a>\n            </body></html>");
+            var sbError = new StringBuilder();
+            sbError.Append("<html><body style='font-family:sans-serif;text-align:center;padding:50px;color:#6b7280;'>");
+            sbError.Append("<i style='font-size:48px;'>📄</i><br/><br/>");
+            sbError.Append("<p>此檔案格式不支援線上預覽</p>");
+            sbError.Append("<a href='../Handlers/下載.ashx?id=");
+            sbError.Append(檔案編號);
+            sbError.Append("' style='color:#1a3a6b;'>點此下載</a>");
+            sbError.Append("</body></html>");
+            context.Response.Write(sbError.ToString());
         }
         catch (Exception ex)
         {
